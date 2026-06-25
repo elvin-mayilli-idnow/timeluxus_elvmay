@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VoltStore — Electronics</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Bebas+Neue&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0d0f14;
+      --surface:  #161a23;
+      --border:   #252b38;
+      --accent:   #4f8ef7;
+      --accent2:  #7c3aed;
+      --text:     #e8eaf0;
+      --muted:    #7a8099;
+      --danger:   #ef4444;
+      --radius:   10px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(13,15,20,.85);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 16px;
+      padding: 0 32px; height: 60px;
+    }
+    .logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 26px; letter-spacing: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      flex-shrink: 0;
+    }
+    .search-wrap {
+      flex: 1; max-width: 480px;
+      display: flex; align-items: center; gap: 8px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: 0 14px; height: 38px;
+    }
+    .search-wrap svg { color: var(--muted); flex-shrink: 0; }
+    .search-wrap input {
+      background: none; border: none; outline: none;
+      color: var(--text); font-size: 14px; width: 100%;
+    }
+    .cart-btn {
+      margin-left: auto; position: relative;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: 8px 14px;
+      color: var(--text); cursor: pointer; font-size: 14px;
+      display: flex; align-items: center; gap: 8px;
+      transition: border-color .2s;
+    }
+    .cart-btn:hover { border-color: var(--accent); }
+    .cart-badge {
+      position: absolute; top: -7px; right: -7px;
+      background: var(--accent); color: #fff;
+      font-size: 11px; font-weight: 600;
+      border-radius: 999px; width: 20px; height: 20px;
+      display: flex; align-items: center; justify-content: center;
+      display: none;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative; overflow: hidden;
+      padding: 80px 32px 72px;
+      border-bottom: 1px solid var(--border);
+    }
+    .hero-glow {
+      position: absolute; top: -80px; left: 50%;
+      transform: translateX(-50%);
+      width: 700px; height: 300px;
+      background: radial-gradient(ellipse, rgba(79,142,247,.22) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-content { max-width: 620px; position: relative; }
+    .eyebrow {
+      font-size: 12px; font-weight: 600; letter-spacing: 3px;
+      text-transform: uppercase; color: var(--accent); margin-bottom: 16px;
+    }
+    .hero h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(48px, 7vw, 80px); line-height: 1;
+      letter-spacing: 2px; margin-bottom: 20px;
+    }
+    .hero h1 span {
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .hero p { color: var(--muted); max-width: 420px; margin-bottom: 32px; }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff; font-weight: 600; font-size: 14px;
+      padding: 12px 24px; border-radius: var(--radius);
+      border: none; cursor: pointer; text-decoration: none;
+      transition: opacity .2s;
+    }
+    .btn-primary:hover { opacity: .88; }
+
+    /* ── FILTERS ── */
+    .filter-bar {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+      padding: 20px 32px; border-bottom: 1px solid var(--border);
+    }
+    .filter-label { font-size: 12px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-right: 4px; }
+    .filter-chip {
+      padding: 6px 14px; border-radius: 999px;
+      border: 1px solid var(--border); background: var(--surface);
+      color: var(--muted); font-size: 13px; cursor: pointer;
+      transition: all .18s;
+    }
+    .filter-chip:hover, .filter-chip.active {
+      border-color: var(--accent); color: var(--accent);
+      background: rgba(79,142,247,.08);
+    }
+
+    /* ── GRID ── */
+    .main { padding: 32px; }
+    .section-title {
+      font-size: 13px; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 24px;
+    }
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 20px;
+    }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); overflow: hidden;
+      cursor: pointer; transition: border-color .2s, transform .2s;
+      position: relative;
+    }
+    .card:hover { border-color: var(--accent); transform: translateY(-3px); }
+    .card-img {
+      width: 100%; height: 160px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 56px; background: var(--bg);
+    }
+    .badge {
+      position: absolute; top: 10px; left: 10px;
+      font-size: 10px; font-weight: 700; letter-spacing: 1px;
+      text-transform: uppercase; padding: 3px 8px; border-radius: 4px;
+    }
+    .badge-new  { background: var(--accent);  color: #fff; }
+    .badge-sale { background: var(--danger);  color: #fff; }
+    .card-body { padding: 14px; }
+    .card-cat  { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+    .card-name { font-weight: 600; font-size: 14px; margin-bottom: 6px; }
+    .card-price {
+      font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 1px;
+      color: var(--accent);
+    }
+    .card-old-price { font-size: 12px; color: var(--muted); text-decoration: line-through; margin-left: 6px; }
+    .card-footer {
+      padding: 0 14px 14px;
+      display: flex; justify-content: flex-end;
+    }
+    .add-btn {
+      background: rgba(79,142,247,.12); border: 1px solid var(--accent);
+      color: var(--accent); font-size: 12px; font-weight: 600;
+      padding: 6px 14px; border-radius: 6px; cursor: pointer;
+      transition: background .2s;
+    }
+    .add-btn:hover { background: var(--accent); color: #fff; }
+
+    /* ── MODAL: Product Detail ── */
+    .overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.65); backdrop-filter: blur(4px);
+      z-index: 200; align-items: center; justify-content: center;
+    }
+    .overlay.open { display: flex; }
+    .modal {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; width: 90%; max-width: 580px;
+      max-height: 90vh; overflow-y: auto; padding: 32px;
+      position: relative;
+    }
+    .modal-close {
+      position: absolute; top: 16px; right: 16px;
+      background: var(--border); border: none; color: var(--text);
+      font-size: 18px; width: 32px; height: 32px; border-radius: 50%;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+    .modal-emoji { font-size: 80px; text-align: center; margin-bottom: 20px; background: var(--bg); border-radius: 10px; padding: 20px; }
+    .modal h2 { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+    .modal-price { font-family: 'Bebas Neue', sans-serif; font-size: 32px; color: var(--accent); margin-bottom: 16px; }
+    .modal-desc { color: var(--muted); font-size: 14px; margin-bottom: 24px; line-height: 1.7; }
+    .modal-specs { border-top: 1px solid var(--border); padding-top: 16px; margin-bottom: 24px; }
+    .modal-specs h4 { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 10px; }
+    .spec-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+    .spec-row span:first-child { color: var(--muted); }
+
+    /* ── CART DRAWER ── */
+    .cart-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.5); z-index: 300;
+    }
+    .cart-overlay.open { display: block; }
+    .cart-drawer {
+      position: fixed; top: 0; right: -420px; width: 400px; height: 100vh;
+      background: var(--surface); border-left: 1px solid var(--border);
+      z-index: 301; padding: 24px; overflow-y: auto;
+      transition: right .3s ease;
+      display: flex; flex-direction: column;
+    }
+    .cart-drawer.open { right: 0; }
+    .cart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .cart-header h2 { font-size: 18px; font-weight: 700; }
+    .cart-close { background: none; border: none; color: var(--muted); font-size: 22px; cursor: pointer; }
+    .cart-items { flex: 1; }
+    .cart-empty { text-align: center; color: var(--muted); padding: 48px 0; font-size: 14px; }
+    .cart-item {
+      display: flex; gap: 12px; padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .cart-item-emoji { font-size: 36px; background: var(--bg); border-radius: 8px; width: 54px; height: 54px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .cart-item-info { flex: 1; }
+    .cart-item-name { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
+    .cart-item-price { font-size: 13px; color: var(--accent); }
+    .cart-item-qty { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+    .qty-btn { background: var(--border); border: none; color: var(--text); width: 22px; height: 22px; border-radius: 4px; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; }
+    .remove-btn { background: none; border: none; color: var(--danger); font-size: 18px; cursor: pointer; margin-left: auto; }
+    .cart-footer { margin-top: 20px; border-top: 1px solid var(--border); padding-top: 20px; }
+    .cart-total { display: flex; justify-content: space-between; font-weight: 700; font-size: 16px; margin-bottom: 16px; }
+    .checkout-btn {
+      width: 100%; padding: 14px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border: none; border-radius: var(--radius); color: #fff;
+      font-size: 15px; font-weight: 700; cursor: pointer; transition: opacity .2s;
+    }
+    .checkout-btn:hover { opacity: .88; }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: #1e2433; border: 1px solid var(--accent);
+      color: var(--text); font-size: 13px; font-weight: 500;
+      padding: 10px 20px; border-radius: 999px;
+      opacity: 0; transition: all .3s; z-index: 400; white-space: nowrap;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── NO RESULTS ── */
+    .no-results { text-align: center; color: var(--muted); padding: 64px 0; }
+    .no-results p { font-size: 14px; }
+
+    @media (max-width: 600px) {
+      nav { padding: 0 16px; }
+      .hero { padding: 48px 16px; }
+      .filter-bar, .main { padding: 16px; }
+      .cart-drawer { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">VoltStore</div>
+  <div class="search-wrap">
+    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input type="text" id="searchInput" placeholder="Search products…" />
+  </div>
+  <button class="cart-btn" onclick="openCart()">
+    🛒 Cart
+    <span class="cart-badge" id="cartBadge">0</span>
+  </button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-content">
+    <div class="eyebrow">New Arrivals — Summer 2026</div>
+    <h1>Power Your <span>World</span></h1>
+    <p>Next-gen electronics for creators, professionals, and everyday innovators. Fast shipping, real support.</p>
+    <a href="#catalog" class="btn-primary">Shop Now ↓</a>
+  </div>
+</section>
+
+<!-- FILTER BAR -->
+<div class="filter-bar">
+  <span class="filter-label">Filter:</span>
+  <button class="filter-chip active" onclick="setFilter('All', this)">All</button>
+  <button class="filter-chip" onclick="setFilter('Laptops', this)">Laptops</button>
+  <button class="filter-chip" onclick="setFilter('Audio', this)">Audio</button>
+  <button class="filter-chip" onclick="setFilter('Phones', this)">Phones</button>
+  <button class="filter-chip" onclick="setFilter('Accessories', this)">Accessories</button>
+  <button class="filter-chip" onclick="setFilter('Cameras', this)">Cameras</button>
+</div>
+
+<!-- CATALOG -->
+<main class="main" id="catalog">
+  <p class="section-title">Products — <span id="countLabel">12 items</span></p>
+  <div class="product-grid" id="productGrid"></div>
+  <div class="no-results" id="noResults" style="display:none">
+    <p>No products match your search.</p>
+  </div>
+</main>
+
+<!-- PRODUCT MODAL -->
+<div class="overlay" id="productOverlay" onclick="closeModal(event)">
+  <div class="modal" id="productModal">
+    <button class="modal-close" onclick="closeModalDirect()">✕</button>
+    <div class="modal-emoji" id="mEmoji"></div>
+    <p id="mCat" style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:4px"></p>
+    <h2 id="mName"></h2>
+    <div class="modal-price" id="mPrice"></div>
+    <p class="modal-desc" id="mDesc"></p>
+    <div class="modal-specs">
+      <h4>Specifications</h4>
+      <div id="mSpecs"></div>
+    </div>
+    <button class="btn-primary" style="width:100%;justify-content:center" onclick="addFromModal()">Add to Cart</button>
+  </div>
+</div>
+
+<!-- CART DRAWER -->
+<div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+<div class="cart-drawer" id="cartDrawer">
+  <div class="cart-header">
+    <h2>Your Cart</h2>
+    <button class="cart-close" onclick="closeCart()">✕</button>
+  </div>
+  <div class="cart-items" id="cartItems">
+    <div class="cart-empty">Your cart is empty.</div>
+  </div>
+  <div class="cart-footer" id="cartFooter" style="display:none">
+    <div class="cart-total">
+      <span>Total</span>
+      <span id="cartTotal">$0.00</span>
+    </div>
+    <button class="checkout-btn">Proceed to Checkout →</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+  /* ── DATA ── */
+  const products = [
+    { id:1,  name:'ProBook Air 14',    cat:'Laptops',     emoji:'💻', price:1199, badge:'new',  desc:'Ultra-thin laptop with a 14" OLED display, 12-core CPU, 16 GB RAM, and 20-hour battery life. Perfect for professionals on the move.', specs:{'Display':'14" OLED 2.8K','Processor':'12-Core CPU','RAM':'16 GB LPDDR5','Storage':'512 GB NVMe SSD','Battery':'20 hrs'} },
+    { id:2,  name:'NovaBuds Pro',      cat:'Audio',       emoji:'🎧', price:249,  badge:'sale', oldPrice:329, desc:'Active noise-cancelling earbuds with spatial audio, 36-hour total battery, and a premium titanium build.', specs:{'Driver':'11mm Dynamic','ANC':'Hybrid 4-mic','Battery':'9h + 27h case','Codec':'LDAC / AAC','Water':'IPX5'} },
+    { id:3,  name:'Pixel Nova 12',     cat:'Phones',      emoji:'📱', price:899,  badge:'new',  desc:'Android flagship with a 6.7" 120 Hz ProMotion display, 200 MP camera system, and satellite messaging.', specs:{'Display':'6.7" 120Hz LTPO','Camera':'200 MP triple','Chipset':'Orion X1','RAM':'12 GB','Battery':'5200 mAh'} },
+    { id:4,  name:'StreamDock Ultra',  cat:'Accessories', emoji:'🖥️', price:129,  badge:null,   desc:'6-in-1 USB-C hub with 4K HDMI, 100W PD charging, SD card reader, and Gigabit Ethernet.', specs:{'Ports':'USB-C, 2×USB-A, HDMI','PD':'100W pass-through','Video':'4K@60Hz','Ethernet':'Gigabit','Compact':'Yes'} },
+    { id:5,  name:'SnapPro X100',      cat:'Cameras',     emoji:'📷', price:1549, badge:null,   desc:'Full-frame mirrorless camera with 61 MP resolution, 8-stop IBIS, and real-time subject tracking for stills and 8K video.', specs:{'Sensor':'61 MP full-frame','Video':'8K / 4K 120fps','IBIS':'8-stop','AF':'Real-time AI tracking','Mount':'E-Mount'} },
+    { id:6,  name:'CrystalBook 16',    cat:'Laptops',     emoji:'🖱️', price:1749, badge:'sale', oldPrice:1999, desc:'16" powerhouse with a mini-LED display, 24-core processor, 32 GB unified memory, and dedicated GPU. Built for creative workloads.', specs:{'Display':'16" Mini-LED 165Hz','Processor':'24-Core','RAM':'32 GB','GPU':'16 GB Dedicated','Storage':'1 TB SSD'} },
+    { id:7,  name:'BassBar S3',        cat:'Audio',       emoji:'🔊', price:349,  badge:null,   desc:'3-channel Dolby Atmos soundbar with a wireless subwoofer, HDMI eARC, and room-calibration technology.', specs:{'Channels':'3.1','Dolby':'Atmos + DTS:X','Input':'HDMI eARC, Optical','Subwoofer':'Wireless 8"','App':'Yes'} },
+    { id:8,  name:'MagCharge Trio',    cat:'Accessories', emoji:'🔋', price:59,   badge:'new',  desc:'Wireless charging pad for phone, earbuds, and smartwatch simultaneously. 15W max output.', specs:{'Output':'15W / 7.5W / 5W','Compatible':'Qi2 & MagSafe','Ports':'1× USB-C In','LED':'Status indicator','Size':'Ø 120 mm'} },
+    { id:9,  name:'VisionCam 4K',      cat:'Cameras',     emoji:'🎥', price:699,  badge:null,   desc:'Compact action camera with 4K 240fps, 360° stabilisation, voice control, and 90-min battery life.', specs:{'Video':'4K 240fps / 1080p 480fps','Stab':'360° HorizonLock','Battery':'90 min','Waterproof':'10 m depth','Screen':'2.4" touch'} },
+    { id:10, name:'ZenPhone Lite',     cat:'Phones',      emoji:'📲', price:449,  badge:null,   desc:'Slim mid-ranger with a 6.4" AMOLED display, 50 MP camera, 5000 mAh battery, and all-day performance for the value-conscious.', specs:{'Display':'6.4" AMOLED 90Hz','Camera':'50 MP + 12 MP','Battery':'5000 mAh','Charging':'65W wired','RAM':'8 GB'} },
+    { id:11, name:'ErgoStand Pro',     cat:'Accessories', emoji:'🖥️', price:89,   badge:null,   desc:'Adjustable aluminium laptop stand with 10 height levels, cable routing, and anti-slip pads. Compatible with laptops up to 17".', specs:{'Material':'Aluminium','Adjust':'10 levels, 15–50°','Max Load':'10 kg','Fold':'Yes, portable','Finish':'Matte Space Gray'} },
+    { id:12, name:'SoundCore Nano',    cat:'Audio',       emoji:'🎵', price:79,   badge:'sale', oldPrice:99,  desc:'Pocket-sized Bluetooth speaker with 360° sound, 20-hour playtime, and IP67 waterproofing. Your go-to travel companion.', specs:{'Output':'10W RMS','Battery':'20 hrs','Bluetooth':'5.3','Water':'IP67','Size':'75 × 75 mm'} },
+  ];
+
+  let cart = [];
+  let activeFilter = 'All';
+  let searchQuery = '';
+  let modalProductId = null;
+
+  /* ── RENDER PRODUCTS ── */
+  function getFiltered() {
+    return products.filter(p => {
+      const matchCat = activeFilter === 'All' || p.cat === activeFilter;
+      const matchQ   = p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                       p.cat.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchCat && matchQ;
+    });
+  }
+
+  function renderProducts() {
+    const list = getFiltered();
+    const grid = document.getElementById('productGrid');
+    const no   = document.getElementById('noResults');
+    document.getElementById('countLabel').textContent = list.length + ' item' + (list.length !== 1 ? 's' : '');
+
+    if (!list.length) { grid.innerHTML = ''; no.style.display = 'block'; return; }
+    no.style.display = 'none';
+
+    grid.innerHTML = list.map(p => `
+      <div class="card" onclick="openModal(${p.id})">
+        ${p.badge ? `<div class="badge badge-${p.badge}">${p.badge}</div>` : ''}
+        <div class="card-img">${p.emoji}</div>
+        <div class="card-body">
+          <div class="card-cat">${p.cat}</div>
+          <div class="card-name">${p.name}</div>
+          <div>
+            <span class="card-price">$${p.price}</span>
+            ${p.oldPrice ? `<span class="card-old-price">$${p.oldPrice}</span>` : ''}
+          </div>
+        </div>
+        <div class="card-footer">
+          <button class="add-btn" onclick="event.stopPropagation();addToCart(${p.id})">+ Add</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  /* ── FILTER ── */
+  function setFilter(cat, el) {
+    activeFilter = cat;
+    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    renderProducts();
+  }
+
+  /* ── SEARCH ── */
+  document.getElementById('searchInput').addEventListener('input', e => {
+    searchQuery = e.target.value;
+    renderProducts();
+  });
+
+  /* ── MODAL ── */
+  function openModal(id) {
+    const p = products.find(x => x.id === id);
+    modalProductId = id;
+    document.getElementById('mEmoji').textContent = p.emoji;
+    document.getElementById('mCat').textContent   = p.cat;
+    document.getElementById('mName').textContent  = p.name;
+    document.getElementById('mPrice').textContent = '$' + p.price;
+    document.getElementById('mDesc').textContent  = p.desc;
+    document.getElementById('mSpecs').innerHTML   = Object.entries(p.specs).map(([k,v]) =>
+      `<div class="spec-row"><span>${k}</span><span>${v}</span></div>`
+    ).join('');
+    document.getElementById('productOverlay').classList.add('open');
+  }
+  function closeModal(e) {
+    if (e.target === document.getElementById('productOverlay')) closeModalDirect();
+  }
+  function closeModalDirect() {
+    document.getElementById('productOverlay').classList.remove('open');
+  }
+  function addFromModal() {
+    addToCart(modalProductId);
+    closeModalDirect();
+  }
+
+  /* ── CART ── */
+  function addToCart(id) {
+    const p = products.find(x => x.id === id);
+    const existing = cart.find(x => x.id === id);
+    if (existing) { existing.qty++; } else { cart.push({ ...p, qty: 1 }); }
+    updateCartUI();
+    showToast(`${p.emoji} ${p.name} added to cart`);
+  }
+
+  function updateCartUI() {
+    const badge = document.getElementById('cartBadge');
+    const total = cart.reduce((s, x) => s + x.qty, 0);
+    if (total > 0) { badge.style.display = 'flex'; badge.textContent = total; } else { badge.style.display = 'none'; }
+    renderCart();
+  }
+
+  function renderCart() {
+    const el = document.getElementById('cartItems');
+    const footer = document.getElementById('cartFooter');
+    if (!cart.length) { el.innerHTML = '<div class="cart-empty">Your cart is empty.</div>'; footer.style.display='none'; return; }
+    footer.style.display = 'block';
+    el.innerHTML = cart.map(item => `
+      <div class="cart-item">
+        <div class="cart-item-emoji">${item.emoji}</div>
+        <div class="cart-item-info">
+          <div class="cart-item-name">${item.name}</div>
+          <div class="cart-item-price">$${(item.price * item.qty).toFixed(2)}</div>
+          <div class="cart-item-qty">
+            <button class="qty-btn" onclick="changeQty(${item.id}, -1)">−</button>
+            <span style="font-size:13px">${item.qty}</span>
+            <button class="qty-btn" onclick="changeQty(${item.id}, 1)">+</button>
+          </div>
+        </div>
+        <button class="remove-btn" onclick="removeItem(${item.id})">🗑</button>
+      </div>
+    `).join('');
+    const sum = cart.reduce((s, x) => s + x.price * x.qty, 0);
+    document.getElementById('cartTotal').textContent = '$' + sum.toFixed(2);
+  }
+
+  function changeQty(id, delta) {
+    const item = cart.find(x => x.id === id);
+    if (!item) return;
+    item.qty += delta;
+    if (item.qty <= 0) cart = cart.filter(x => x.id !== id);
+    updateCartUI();
+  }
+  function removeItem(id) {
+    cart = cart.filter(x => x.id !== id);
+    updateCartUI();
+  }
+
+  function openCart()  { document.getElementById('cartDrawer').classList.add('open'); document.getElementById('cartOverlay').classList.add('open'); }
+  function closeCart() { document.getElementById('cartDrawer').classList.remove('open'); document.getElementById('cartOverlay').classList.remove('open'); }
+
+  /* ── TOAST ── */
+  let toastTimer;
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+  }
+
+  /* ── INIT ── */
+  renderProducts();
+</script>
+</body>
+</html>
