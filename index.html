@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TimeLuxus — Luxury Timepieces</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0a0806;
+      --surface:  #111009;
+      --border:   #2a2418;
+      --gold:     #c9a84c;
+      --gold2:    #e8d08a;
+      --gold-dim: rgba(201,168,76,.12);
+      --text:     #e8e0d0;
+      --muted:    #7a7060;
+      --radius:   4px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-weight: 300;
+      font-size: 14px;
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; width: 100%; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 48px; height: 64px;
+      background: rgba(10,8,6,.92);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px; font-weight: 600; letter-spacing: 8px;
+      text-transform: uppercase;
+      background: linear-gradient(90deg, var(--gold), var(--gold2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .nav-links { display: flex; gap: 36px; }
+    .nav-links a {
+      text-decoration: none; color: var(--muted);
+      font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--gold); }
+    .nav-cart {
+      background: none; border: 1px solid var(--border);
+      color: var(--muted); font-size: 11px; letter-spacing: 2px;
+      text-transform: uppercase; padding: 8px 18px; cursor: pointer;
+      transition: all .2s; border-radius: var(--radius);
+      position: relative;
+    }
+    .nav-cart:hover { border-color: var(--gold); color: var(--gold); }
+    .cart-badge {
+      position: absolute; top: -7px; right: -7px;
+      background: var(--gold); color: #0a0806;
+      font-size: 10px; font-weight: 700;
+      border-radius: 50%; width: 18px; height: 18px;
+      display: none; align-items: center; justify-content: center;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; padding: 100px 32px 80px;
+      position: relative; overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 50% 60%, rgba(201,168,76,.07) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 40% at 20% 20%, rgba(201,168,76,.04) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .hero-line {
+      width: 1px; height: 80px; background: linear-gradient(to bottom, transparent, var(--gold));
+      margin: 0 auto 40px;
+    }
+    .hero-eyebrow {
+      font-size: 10px; letter-spacing: 6px; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 28px;
+    }
+    .hero h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(52px, 9vw, 110px);
+      font-weight: 300; line-height: .95;
+      letter-spacing: -1px; margin-bottom: 32px;
+    }
+    .hero h1 em {
+      font-style: italic; color: var(--gold);
+    }
+    .hero-sub {
+      color: var(--muted); font-size: 13px; letter-spacing: 1px;
+      max-width: 400px; margin: 0 auto 48px;
+    }
+    .hero-cta {
+      display: inline-flex; align-items: center; gap: 12px;
+      border: 1px solid var(--gold); color: var(--gold);
+      font-size: 11px; letter-spacing: 4px; text-transform: uppercase;
+      padding: 14px 32px; text-decoration: none;
+      transition: all .3s; cursor: pointer; background: none;
+    }
+    .hero-cta:hover { background: var(--gold-dim); }
+    .hero-scroll {
+      position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+      font-size: 10px; letter-spacing: 3px; color: var(--muted); text-transform: uppercase;
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+    }
+    .hero-scroll-line {
+      width: 1px; height: 40px;
+      background: linear-gradient(to bottom, var(--muted), transparent);
+      animation: scrollPulse 2s ease-in-out infinite;
+    }
+    @keyframes scrollPulse { 0%,100%{opacity:.3} 50%{opacity:1} }
+
+    /* ── DIVIDER ── */
+    .divider {
+      display: flex; align-items: center; gap: 20px;
+      padding: 0 48px; margin: 0;
+    }
+    .divider-line { flex: 1; height: 1px; background: var(--border); }
+    .divider-diamond {
+      width: 6px; height: 6px; background: var(--gold);
+      transform: rotate(45deg); flex-shrink: 0;
+    }
+
+    /* ── COLLECTION ── */
+    .collection { padding: 80px 48px; }
+    .section-header { text-align: center; margin-bottom: 64px; }
+    .section-eyebrow {
+      font-size: 10px; letter-spacing: 5px; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 16px;
+    }
+    .section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(32px, 4vw, 52px); font-weight: 300; line-height: 1.1;
+    }
+
+    .watch-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 2px;
+    }
+
+    .watch-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      cursor: pointer; position: relative; overflow: hidden;
+      transition: border-color .3s;
+      display: flex; flex-direction: column;
+    }
+    .watch-card:hover { border-color: var(--gold); }
+    .watch-card:hover .card-reveal { opacity: 1; transform: translateY(0); }
+    .watch-card:hover .watch-face { transform: scale(1.04); }
+
+    .watch-img {
+      width: 100%; aspect-ratio: 1;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 90px; background: var(--bg);
+      overflow: hidden;
+    }
+    .watch-face {
+      font-size: 90px; transition: transform .5s ease;
+      user-select: none;
+    }
+    .watch-badge {
+      position: absolute; top: 14px; right: 14px;
+      font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+      padding: 4px 10px; border: 1px solid var(--gold); color: var(--gold);
+    }
+    .watch-body { padding: 20px 20px 8px; flex: 1; }
+    .watch-maison {
+      font-size: 9px; letter-spacing: 4px; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 6px;
+    }
+    .watch-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 20px; font-weight: 400; margin-bottom: 4px;
+    }
+    .watch-ref { font-size: 10px; color: var(--muted); letter-spacing: 1px; }
+
+    .watch-footer {
+      padding: 16px 20px 20px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-top: 1px solid var(--border);
+    }
+    .watch-price {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px; color: var(--gold); font-weight: 400;
+    }
+    .add-btn {
+      background: none; border: 1px solid var(--border); color: var(--muted);
+      font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+      padding: 7px 14px; cursor: pointer; border-radius: var(--radius);
+      transition: all .2s;
+    }
+    .add-btn:hover { border-color: var(--gold); color: var(--gold); background: var(--gold-dim); }
+
+    .card-reveal {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: linear-gradient(to top, rgba(10,8,6,.9) 0%, transparent 100%);
+      padding: 20px; opacity: 0; transform: translateY(8px);
+      transition: all .3s; pointer-events: none;
+      font-size: 11px; color: var(--muted); letter-spacing: .5px;
+    }
+
+    /* ── HERITAGE STRIP ── */
+    .heritage {
+      padding: 80px 48px;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 80px; align-items: center;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .heritage-text .tag {
+      font-size: 10px; letter-spacing: 5px; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 20px; display: block;
+    }
+    .heritage-text h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(30px, 3vw, 46px); font-weight: 300; line-height: 1.15;
+      margin-bottom: 24px;
+    }
+    .heritage-text h2 em { font-style: italic; color: var(--gold); }
+    .heritage-text p { color: var(--muted); line-height: 1.9; margin-bottom: 32px; }
+    .heritage-stats {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+    }
+    .stat-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 40px; font-weight: 300; color: var(--gold); line-height: 1;
+    }
+    .stat-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-top: 4px; }
+    .heritage-visual {
+      display: flex; align-items: center; justify-content: center;
+      font-size: 160px; aspect-ratio: 1;
+      border: 1px solid var(--border);
+      background: radial-gradient(ellipse at center, rgba(201,168,76,.06), transparent 70%);
+    }
+
+    /* ── MODAL ── */
+    .overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(5,4,3,.85); backdrop-filter: blur(8px);
+      z-index: 200; align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    .overlay.open { display: flex; }
+    .modal {
+      background: var(--surface); border: 1px solid var(--border);
+      width: 90%; max-width: 640px; max-height: 90vh;
+      overflow-y: auto; position: relative;
+    }
+    .modal-top {
+      display: grid; grid-template-columns: 1fr 1fr;
+      border-bottom: 1px solid var(--border);
+    }
+    .modal-img {
+      aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+      font-size: 100px; background: var(--bg);
+    }
+    .modal-info { padding: 32px 24px; display: flex; flex-direction: column; justify-content: center; }
+    .modal-maison { font-size: 9px; letter-spacing: 4px; text-transform: uppercase; color: var(--gold); margin-bottom: 10px; }
+    .modal-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 28px; font-weight: 300; line-height: 1.1; margin-bottom: 8px;
+    }
+    .modal-ref { font-size: 10px; color: var(--muted); letter-spacing: 1px; margin-bottom: 20px; }
+    .modal-price {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 34px; color: var(--gold); margin-bottom: 24px;
+    }
+    .modal-add {
+      border: 1px solid var(--gold); color: var(--gold); background: none;
+      font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+      padding: 12px 20px; cursor: pointer; transition: background .2s; width: 100%;
+    }
+    .modal-add:hover { background: var(--gold-dim); }
+    .modal-body { padding: 28px; }
+    .modal-desc { color: var(--muted); font-size: 13px; line-height: 1.9; margin-bottom: 24px; }
+    .spec-title {
+      font-size: 9px; letter-spacing: 4px; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 14px;
+    }
+    .spec-row {
+      display: flex; justify-content: space-between;
+      padding: 10px 0; border-bottom: 1px solid var(--border);
+      font-size: 12px;
+    }
+    .spec-row span:first-child { color: var(--muted); letter-spacing: .5px; }
+    .modal-close {
+      position: absolute; top: 14px; right: 14px;
+      background: none; border: 1px solid var(--border); color: var(--muted);
+      width: 30px; height: 30px; cursor: pointer; font-size: 14px;
+      display: flex; align-items: center; justify-content: center;
+      transition: all .2s;
+    }
+    .modal-close:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* ── CART DRAWER ── */
+    .cart-overlay-bg {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.5); z-index: 300;
+    }
+    .cart-overlay-bg.open { display: block; }
+    .cart-drawer {
+      position: fixed; top: 0; right: -440px; width: 420px; height: 100vh;
+      background: var(--surface); border-left: 1px solid var(--border);
+      z-index: 301; display: flex; flex-direction: column;
+      transition: right .35s ease;
+    }
+    .cart-drawer.open { right: 0; }
+    .cart-head {
+      padding: 24px 28px; border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .cart-head h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px; font-weight: 300; letter-spacing: 2px;
+    }
+    .cart-x { background: none; border: none; color: var(--muted); font-size: 20px; cursor: pointer; }
+    .cart-body { flex: 1; overflow-y: auto; padding: 0 28px; }
+    .cart-empty-msg { text-align: center; color: var(--muted); padding: 60px 0; font-size: 13px; letter-spacing: 1px; }
+    .cart-item {
+      display: flex; gap: 14px; padding: 20px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .ci-emoji {
+      width: 60px; height: 60px; background: var(--bg); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 32px; flex-shrink: 0;
+    }
+    .ci-info { flex: 1; }
+    .ci-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 16px; font-weight: 400; margin-bottom: 2px;
+    }
+    .ci-maison { font-size: 9px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; }
+    .ci-price { font-size: 13px; color: var(--gold); }
+    .ci-qty { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+    .qty-btn {
+      width: 22px; height: 22px; background: var(--border); border: none;
+      color: var(--text); cursor: pointer; font-size: 14px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .ci-remove { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 16px; margin-left: auto; align-self: flex-start; }
+    .ci-remove:hover { color: #ef4444; }
+    .cart-foot {
+      padding: 24px 28px; border-top: 1px solid var(--border);
+      display: none;
+    }
+    .cart-total-row {
+      display: flex; justify-content: space-between; align-items: baseline;
+      margin-bottom: 20px;
+    }
+    .cart-total-label { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); }
+    .cart-total-val {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 28px; color: var(--gold);
+    }
+    .checkout-btn {
+      width: 100%; border: 1px solid var(--gold); background: none;
+      color: var(--gold); font-size: 11px; letter-spacing: 4px;
+      text-transform: uppercase; padding: 16px; cursor: pointer; transition: background .2s;
+    }
+    .checkout-btn:hover { background: var(--gold-dim); }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed; bottom: 28px; left: 50%;
+      transform: translateX(-50%) translateY(60px);
+      background: var(--surface); border: 1px solid var(--gold);
+      color: var(--text); font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+      padding: 12px 24px; opacity: 0; transition: all .3s; z-index: 500; white-space: nowrap;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 48px; border-top: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .footer-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 18px; letter-spacing: 8px; text-transform: uppercase;
+      background: linear-gradient(90deg, var(--gold), var(--gold2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .footer-text { font-size: 11px; color: var(--muted); letter-spacing: 1px; }
+
+    @media (max-width: 768px) {
+      nav { padding: 0 20px; }
+      .nav-links { display: none; }
+      .collection, .heritage { padding: 48px 20px; }
+      .heritage { grid-template-columns: 1fr; gap: 40px; }
+      .heritage-visual { display: none; }
+      .modal-top { grid-template-columns: 1fr; }
+      .modal-img { aspect-ratio: auto; padding: 32px; }
+      .cart-drawer { width: 100%; }
+      footer { flex-direction: column; gap: 16px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">TimeLuxus</div>
+  <div class="nav-links">
+    <a href="#collection">Collection</a>
+    <a href="#heritage">Heritage</a>
+    <a href="#">Contact</a>
+  </div>
+  <button class="nav-cart" onclick="openCart()">
+    Cart
+    <span class="cart-badge" id="cartBadge">0</span>
+  </button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-line"></div>
+  <p class="hero-eyebrow">TimeLuxus — Est. 1887</p>
+  <h1>Time is the only<br><em>true luxury</em></h1>
+  <p class="hero-sub">Each piece is a conversation between the craftsman's hand and the passing of centuries.</p>
+  <a href="#collection" class="hero-cta">Discover the Collection →</a>
+  <div class="hero-scroll">
+    <div class="hero-scroll-line"></div>
+    Scroll
+  </div>
+</section>
+
+<div class="divider"><div class="divider-line"></div><div class="divider-diamond"></div><div class="divider-line"></div></div>
+
+<!-- COLLECTION -->
+<section class="collection" id="collection">
+  <div class="section-header">
+    <p class="section-eyebrow">The 2026 Collection</p>
+    <h2 class="section-title">Crafted for Eternity</h2>
+  </div>
+  <div class="watch-grid" id="watchGrid"></div>
+</section>
+
+<div class="divider"><div class="divider-line"></div><div class="divider-diamond"></div><div class="divider-line"></div></div>
+
+<!-- HERITAGE -->
+<section class="heritage" id="heritage">
+  <div class="heritage-text">
+    <span class="tag">Our Heritage</span>
+    <h2>Over a century of<br><em>uncompromised</em> craft</h2>
+    <p>Founded in Geneva in 1887, Maison Aurum has spent more than 135 years perfecting the art of haute horlogerie. Every movement is assembled by hand, every case hand-finished to a standard no machine can replicate.</p>
+    <div class="heritage-stats">
+      <div>
+        <div class="stat-num">135+</div>
+        <div class="stat-label">Years of craft</div>
+      </div>
+      <div>
+        <div class="stat-num">12</div>
+        <div class="stat-label">Master watchmakers</div>
+      </div>
+      <div>
+        <div class="stat-num">400h</div>
+        <div class="stat-label">Per timepiece</div>
+      </div>
+      <div>
+        <div class="stat-num">18k</div>
+        <div class="stat-label">Gold cases</div>
+      </div>
+    </div>
+  </div>
+  <div class="heritage-visual">⌚</div>
+</section>
+
+<!-- PRODUCT MODAL -->
+<div class="overlay" id="productOverlay" onclick="overlayClick(event)">
+  <div class="modal" id="productModal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-top">
+      <div class="modal-img" id="mEmoji"></div>
+      <div class="modal-info">
+        <div class="modal-maison" id="mMaison"></div>
+        <div class="modal-name" id="mName"></div>
+        <div class="modal-ref" id="mRef"></div>
+        <div class="modal-price" id="mPrice"></div>
+        <button class="modal-add" onclick="addFromModal()">Add to Selection</button>
+      </div>
+    </div>
+    <div class="modal-body">
+      <p class="modal-desc" id="mDesc"></p>
+      <div class="spec-title">Movement & Specifications</div>
+      <div id="mSpecs"></div>
+    </div>
+  </div>
+</div>
+
+<!-- CART DRAWER -->
+<div class="cart-overlay-bg" id="cartOverlayBg" onclick="closeCart()"></div>
+<div class="cart-drawer" id="cartDrawer">
+  <div class="cart-head">
+    <h2>Your Selection</h2>
+    <button class="cart-x" onclick="closeCart()">✕</button>
+  </div>
+  <div class="cart-body" id="cartBody">
+    <div class="cart-empty-msg">Your selection is empty.</div>
+  </div>
+  <div class="cart-foot" id="cartFoot">
+    <div class="cart-total-row">
+      <span class="cart-total-label">Total</span>
+      <span class="cart-total-val" id="cartTotal">$0</span>
+    </div>
+    <button class="checkout-btn">Request Private Consultation →</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">TimeLuxus</div>
+  <div class="footer-text">© 2026 TimeLuxus. All rights reserved.</div>
+</footer>
+
+<script>
+  const watches = [
+    {
+      id: 1, maison: 'TimeLuxus', name: 'Perpetual Céleste', ref: 'Ref. AU-2601', emoji: '🕐',
+      price: 28500, badge: 'New',
+      desc: 'The Perpetual Céleste is a masterwork in astronomical complications. Its perpetual calendar tracks months, days, leap years, and moon phases simultaneously — never requiring manual correction until 2100.',
+      specs: { 'Movement': 'Cal. AU-9600 Automatic', 'Power Reserve': '72 hours', 'Case': '40mm 18k White Gold', 'Dial': 'Grand Feu enamel, blue', 'Water Resistance': '50m', 'Crystal': 'Sapphire, double AR-coated', 'Bracelet': 'Hand-stitched alligator' }
+    },
+    {
+      id: 2, maison: 'TimeLuxus', name: 'Tourbillon Noir', ref: 'Ref. AU-2602', emoji: '🕑',
+      price: 74000, badge: 'Limited',
+      desc: 'A flying tourbillon suspended in a skeletonised dial of blackened 18k gold. Only 18 pieces will ever be produced. Each is individually numbered and accompanied by a certificate of authenticity.',
+      specs: { 'Movement': 'Cal. AU-T01 Manual', 'Power Reserve': '120 hours', 'Case': '42mm 18k Black Gold', 'Dial': 'Open-worked, DLC bridges', 'Complication': 'Flying Tourbillon', 'Crystal': 'Domed sapphire', 'Strap': 'Rubber & alligator lug' }
+    },
+    {
+      id: 3, maison: 'TimeLuxus', name: 'Chronographe Sport', ref: 'Ref. AU-2603', emoji: '🕒',
+      price: 18900, badge: null,
+      desc: 'A column-wheel chronograph born from Aurum\'s motorsport heritage. The bi-compax layout reads at a glance while the integrated bracelet sits flush against the wrist for all-day comfort.',
+      specs: { 'Movement': 'Cal. AU-CHR-2 Automatic', 'Power Reserve': '68 hours', 'Case': '41mm Titanium', 'Dial': 'Slate grey, applied indices', 'Complication': 'Flyback Chronograph', 'Water Resistance': '200m', 'Bracelet': 'Integrated titanium' }
+    },
+    {
+      id: 4, maison: 'TimeLuxus', name: 'Dame Rose', ref: 'Ref. AU-2604', emoji: '🕓',
+      price: 22400, badge: 'New',
+      desc: 'Designed for the modern connoisseur, the Dame Rose features a 36mm case set with 78 brilliant-cut diamonds on the bezel, a mother-of-pearl dial, and a three-row diamond bracelet.',
+      specs: { 'Movement': 'Cal. AU-8000 Automatic', 'Power Reserve': '42 hours', 'Case': '36mm 18k Rose Gold', 'Dial': 'Mother-of-pearl', 'Diamonds': '78 × VVS1, 1.4ct bezel', 'Crystal': 'Sapphire', 'Bracelet': '18k Rose Gold, 3-row' }
+    },
+    {
+      id: 5, maison: 'TimeLuxus', name: 'Grande Complication', ref: 'Ref. AU-2605', emoji: '🕔',
+      price: 142000, badge: 'Bespoke',
+      desc: 'The pinnacle of Aurum\'s craft. Westminster chiming minutes repeater, perpetual calendar, and split-second chronograph housed in a single 45mm platinum case. Requires 400 hours of hand-assembly.',
+      specs: { 'Movement': 'Cal. AU-GC Manufacture', 'Power Reserve': '55 hours', 'Case': '45mm Platinum 950', 'Complications': 'Minute Repeater, Perpetual Calendar, Split-second Chronograph', 'Dial': 'Cloisonné enamel', 'Finishing': '600+ hand-bevelled components', 'Delivery': '18 months' }
+    },
+    {
+      id: 6, maison: 'TimeLuxus', name: 'Heritage Automatic', ref: 'Ref. AU-2606', emoji: '🕕',
+      price: 9800, badge: null,
+      desc: 'Entry into the world of Aurum. Elegant simplicity: a slender 39mm case, an argenté dial with blued-steel hands, and an in-house automatic movement visible through the exhibition caseback.',
+      specs: { 'Movement': 'Cal. AU-3100 Automatic', 'Power Reserve': '48 hours', 'Case': '39mm 316L Steel', 'Dial': 'Argenté, sunray-brushed', 'Hands': 'Blued steel, sword-shaped', 'Crystal': 'Sapphire with AR coating', 'Strap': 'Brown calfskin leather' }
+    },
+  ];
+
+  let cart = [];
+  let activeId = null;
+
+  /* ── RENDER ── */
+  function renderWatches() {
+    document.getElementById('watchGrid').innerHTML = watches.map(w => `
+      <div class="watch-card" onclick="openModal(${w.id})">
+        ${w.badge ? `<div class="watch-badge">${w.badge}</div>` : ''}
+        <div class="watch-img"><div class="watch-face">${w.emoji}</div></div>
+        <div class="watch-body">
+          <div class="watch-maison">${w.maison}</div>
+          <div class="watch-name">${w.name}</div>
+          <div class="watch-ref">${w.ref}</div>
+        </div>
+        <div class="watch-footer">
+          <div class="watch-price">$${w.price.toLocaleString()}</div>
+          <button class="add-btn" onclick="event.stopPropagation();addToCart(${w.id})">Reserve</button>
+        </div>
+        <div class="card-reveal">${Object.entries(w.specs)[0][0]}: ${Object.entries(w.specs)[0][1]}</div>
+      </div>
+    `).join('');
+  }
+
+  /* ── MODAL ── */
+  function openModal(id) {
+    const w = watches.find(x => x.id === id);
+    activeId = id;
+    document.getElementById('mEmoji').textContent  = w.emoji;
+    document.getElementById('mMaison').textContent = w.maison;
+    document.getElementById('mName').textContent   = w.name;
+    document.getElementById('mRef').textContent    = w.ref;
+    document.getElementById('mPrice').textContent  = '$' + w.price.toLocaleString();
+    document.getElementById('mDesc').textContent   = w.desc;
+    document.getElementById('mSpecs').innerHTML    = Object.entries(w.specs).map(([k,v]) =>
+      `<div class="spec-row"><span>${k}</span><span>${v}</span></div>`
+    ).join('');
+    document.getElementById('productOverlay').classList.add('open');
+  }
+  function closeModal() { document.getElementById('productOverlay').classList.remove('open'); }
+  function overlayClick(e) { if (e.target === document.getElementById('productOverlay')) closeModal(); }
+  function addFromModal() { addToCart(activeId); closeModal(); }
+
+  /* ── CART ── */
+  function addToCart(id) {
+    const w = watches.find(x => x.id === id);
+    const ex = cart.find(x => x.id === id);
+    if (ex) { ex.qty++; } else { cart.push({ ...w, qty: 1 }); }
+    updateCart();
+    showToast(`${w.name} added to selection`);
+  }
+
+  function updateCart() {
+    const total = cart.reduce((s, x) => s + x.qty, 0);
+    const badge = document.getElementById('cartBadge');
+    if (total > 0) { badge.style.display = 'flex'; badge.textContent = total; } else { badge.style.display = 'none'; }
+    renderCart();
+  }
+
+  function renderCart() {
+    const body = document.getElementById('cartBody');
+    const foot = document.getElementById('cartFoot');
+    if (!cart.length) { body.innerHTML = '<div class="cart-empty-msg">Your selection is empty.</div>'; foot.style.display='none'; return; }
+    foot.style.display = 'block';
+    body.innerHTML = cart.map(item => `
+      <div class="cart-item">
+        <div class="ci-emoji">${item.emoji}</div>
+        <div class="ci-info">
+          <div class="ci-maison">${item.maison}</div>
+          <div class="ci-name">${item.name}</div>
+          <div class="ci-price">$${(item.price * item.qty).toLocaleString()}</div>
+          <div class="ci-qty">
+            <button class="qty-btn" onclick="changeQty(${item.id},-1)">−</button>
+            <span style="font-size:12px">${item.qty}</span>
+            <button class="qty-btn" onclick="changeQty(${item.id},1)">+</button>
+          </div>
+        </div>
+        <button class="ci-remove" onclick="removeItem(${item.id})">✕</button>
+      </div>
+    `).join('');
+    const sum = cart.reduce((s,x) => s + x.price * x.qty, 0);
+    document.getElementById('cartTotal').textContent = '$' + sum.toLocaleString();
+  }
+
+  function changeQty(id, d) {
+    const item = cart.find(x => x.id === id);
+    if (!item) return;
+    item.qty += d;
+    if (item.qty <= 0) cart = cart.filter(x => x.id !== id);
+    updateCart();
+  }
+  function removeItem(id) { cart = cart.filter(x => x.id !== id); updateCart(); }
+  function openCart()  { document.getElementById('cartDrawer').classList.add('open'); document.getElementById('cartOverlayBg').classList.add('open'); }
+  function closeCart() { document.getElementById('cartDrawer').classList.remove('open'); document.getElementById('cartOverlayBg').classList.remove('open'); }
+
+  /* ── TOAST ── */
+  let toastT;
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    clearTimeout(toastT);
+    toastT = setTimeout(() => t.classList.remove('show'), 2400);
+  }
+
+  renderWatches();
+</script>
+</body>
+</html>
